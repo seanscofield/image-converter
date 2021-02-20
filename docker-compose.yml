@@ -1,0 +1,43 @@
+version: "3.7"
+
+networks:
+  image_converter:
+  external:
+    attachable: true
+
+services:
+  image_converter:
+    image: "${IMAGE_NAME:-image_converter}"
+    networks:
+      - image_converter
+    environment:
+      AWS_ACCESS_KEY_ID: "foo"
+      AWS_SECRET_ACCESS_KEY: "bar"
+      AWS_ENDPOINT_URL: "http://localstack:4566"
+      SQS_QUEUE_URL: "http://localstack:4566/000000000000/image_converter"
+      ENV: "LOCAL"
+    depends_on:
+      - localstack
+
+  localstack:
+    image: "localstack/localstack:0.12.1"
+    networks:
+      - image_converter
+      - external
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: "s3,sqs"
+      DOCKER_HOST: "unix:///var/run/docker.sock"
+      DATA_DIR: "/tmp/localstack"
+    volumes:
+      - ./resources/localstack-setup.sh:/docker-entrypoint-initaws.d/localstack-setup.sh
+
+#  tracking:
+#    image: outofcoffee/imposter-rest
+#    networks:
+#      - phasing
+#    volumes:
+#      - ./resources/test/mock_tracking_api:/opt/imposter/config
+#    ports:
+#      - "8000:8080"
