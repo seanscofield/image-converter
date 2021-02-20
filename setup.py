@@ -8,7 +8,8 @@ setup(
 
     packages=find_packages(exclude=['test*']),
     install_requires=[
-        'boto3==1.10.46'
+        'boto3',
+        'pillow'
     ],
 
     entry_points={

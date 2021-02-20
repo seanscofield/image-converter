@@ -1,9 +1,5 @@
-#!/usr/bin/env bash
-# SQS SETUP
-set -x  # turn on and off outputting of the commands being executed
-
+# Create SQS queue
 awslocal sqs create-queue --queue-name image_converter
 
-# S3 setup
+# Create S3 bucket
 awslocal s3 mb s3://images
-set +x
