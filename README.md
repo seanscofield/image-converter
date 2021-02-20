@@ -15,8 +15,10 @@ This is an example application intended to demonstrate how to easily develop and
 This repo contains a _Makefile_ with some helpful commands to build and run this application directly on one's computer:
 
 * `make` - Packages this application into a docker image
-* `make deploy` - Spins up a docker container from the built image. Also spins up a [localstack](https://github.com/localstack/localstack/blob/master/README.md) docker container (a fully functional local AWS cloud stack), and creates the SQS queue and S3 bucket that our application will leverage
+* `make deploy` - Spins up a docker container from the built image. Also spins up a [localstack](https://github.com/localstack/localstack/blob/master/README.md) docker container (a fully functional local AWS cloud stack), and creates the SQS queue and S3 bucket that our application will leverage (note that some users will need to run `docker swarm init` before this deploy will work; also note that it could take up to 30 seconds for everything to start up)
 * `make clean` - Tears down all of the docker containers
+
+In order to interact with this application once it's up and running, refer to the "Interacting with this application" section further down in the README.
 
 #### Running directly with Python
 
@@ -26,7 +28,7 @@ For anyone looking to run this application directly with python, it can be insta
 pip install .
 ```
 
-Before you start running the application, however, you'll need to make sure that _localstack_ and our SQS/S3 resources have been spun up. The easiest way to do this is by running `docker-compose up -d localstack`, which, as touched upon in the previous section, will spin up a [localstack](https://github.com/localstack/localstack/blob/master/README.md) docker container.
+Before you start running the application, however, you'll need to make sure that _localstack_ and our SQS/S3 resources have been spun up. The easiest way to do this is by running `docker-compose up -d localstack`, which, as touched upon in the previous section, will spin up a [localstack](https://github.com/localstack/localstack/blob/master/README.md) docker container (again, note that it could take up to 30 seconds for localstack to boot up all the way).
 
 At this point, you'll have to set up some fake AWS credentials and other environment variables needed by our application:
 
@@ -56,6 +58,8 @@ image_converter
 Once you've gotten things up and running, the application will continuously poll an SQS queue in localstack for messages containing the S3 path to a png file awaiting conversion. You can upload an example png file and send a message to the SQS queue using the following commands:
 
 ```
+export AWS_ACCESS_KEY_ID=foo
+export AWS_SECRET_ACCESS_KEY=bar
 aws --endpoint-url https://localhost:4566 s3 cp resources/example.png s3://images/ --no-verify-ssl
 aws --endpoint-url http://localhost:4566 sqs send-message --message-body "{\"bucket\": \"images\", \"object\": \"example.png\"}" --queue-url http://localhost:4566/queue/image_converter --region us-east-1
 ```
