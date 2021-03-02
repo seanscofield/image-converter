@@ -13,6 +13,13 @@ sqs_queue_url = os.environ['SQS_QUEUE_URL']
 s3_client = boto3.client('s3', region_name='us-east-1', endpoint_url=endpoint_url)
 sqs_client = boto3.client('sqs', region_name='us-east-1', endpoint_url=endpoint_url)
 
+
+def convert_png_to_jpg(png_file_path, jpg_file_path):
+    im = Image.open(png_file_path)
+    im = im.convert('RGB')
+    im.save(jpg_file_path, "JPEG")
+
+
 def main():
     print(f"Continually polling SQS queue {sqs_queue_url}...", flush=True)
     while True:
@@ -26,9 +33,7 @@ def main():
                 png_file_path = f'/tmp/{bucket_object}'
                 jpg_file_path = png_file_path.replace('.png', '.jpg')
                 s3_client.download_file(bucket, bucket_object, png_file_path)
-                im = Image.open(png_file_path)
-                im = im.convert('RGB')
-                im.save(jpg_file_path, "JPEG")
+                convert_png_to_jpg(png_file_path, jpg_file_path)
                 s3_client.upload_file(jpg_file_path, bucket, bucket_object.replace('.png', '.jpg'))
                 print(f'New JPEG created from {bucket_object}: s3://{bucket}/{bucket_object.replace(".png", ".jpg")}')
 
