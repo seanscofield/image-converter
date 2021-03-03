@@ -6,7 +6,7 @@ This is an example application intended to demonstrate how to easily develop and
 
 * `python` (only Python 3.x is supported)
 * `pip` (python package manager)
-* `Docker`
+* `Docker + Docker Compose`
 
 ## Running this application
 
